@@ -143,10 +143,11 @@ export default {
   methods: {
     submitForm() {
       axios.post(
-        'http://localhost:81/vue-php-form-validation/server/validation.php',
-        this.title)
+        'http://localhost:81/vue-php-form-validation/server/validation.php', this.formData
+        )
         .then(response => {
-          if (response.data.status) {
+          console.log('resp', response)
+          if (response.data) {
             console.log('true', response.data);
             this.errors = [];
             this.isValid = true;
