@@ -4,8 +4,6 @@ session_start();
 // fixed CORS error -------------------------------
 function cors()
 {
-    // headers('Content-Type: application/json');
-
     if (isset($_SERVER['HTTP_ORIGIN'])) {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS");
@@ -33,8 +31,6 @@ cors();
 $dataJSON = file_get_contents('php://input');
 $data = json_decode($dataJSON, true);
 
-header("Content-type: application/json");
-
 $title = $data['title'];
 $annotation = $data['annotation'];
 $content = $data['content'];
@@ -43,47 +39,50 @@ $views = $data['views'];
 $date = $data['date'];
 $publish_in_index = $data['publish_in_index'];
 $category = $data['category'];
-$isValid = $data['isValid'];
-$errors = [];
+
+$resp = array('error' => false, 'message' => []);
 
 if (empty($title) || mb_strlen($title) < 3 || mb_strlen($title) > 255) {
-    $errors[] = 'Enter correct title';
-    $isValid = false;
+    $resp['message'][] = 'Enter correct title';
+    $resp['error'] = true;
 } else {
-    $errors[] = '';
-    $isValid = true;
+    $resp['message'][] = '';
+    $resp['error'] = false;
 }
 
-if (mb_strlen($annotation) > 500) {
-    $errors[] = 'The number of character must be less than 500';
-    $isValid = false;
+if (!empty($annotation) && mb_strlen($annotation) > 500) {
+    $resp['message'][] = 'The number of character must be less than 500';
+    $resp['error'] = true;
 } else {
-    $errors[] = '';
-    $isValid = true;
+    $resp['message'][] = '';
+    $resp['error'] = false;
 }
 
-if (mb_strlen($content) > 30000) {
-    $errors[] = 'The number of character must be less than 30000';
-    $isValid = false;
+if (!empty($content) && mb_strlen($content) > 30000) {
+    $resp['message'][] = 'The number of character must be less than 30000';
+    $resp['error'] = true;
 } else {
-    $errors[] = '';
-    $isValid = true;
+    $resp['message'][] = '';
+    $resp['error'] = false;
+
 }
 
 if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $errors[] = 'Enter correct email';
-    $isValid = false;
+    $resp['message'][] = 'Enter correct email';
+    $resp['error'] = true;
 } else {
-    $errors[] = '';
-    $isValid = true;
+    $resp['message'][] = '';
+    $resp['error'] = false;
+
 }
 
 if (!preg_match("/^[0-9]*$/", (int) $views) || (int) $views < 0) {
-    $errors[] = 'Views must be a number and greater than zero';
-    $isValid = false;
+    $resp['message'][] = 'Views must be a number and greater than zero';
+    $resp['error'] = true;
 } else {
-    $errors[] = '';
-    $isValid = true;
+    $resp['message'][] = '';
+    $resp['error'] = false;
+
 }
 
 function checkBiggerThanToday($date)
@@ -100,28 +99,32 @@ if (!empty($date)) {
     if (!checkdate((int) $dateArr[1], (int) $dateArr[2], (int) $dateArr[0])
         || !checkBiggerThanToday($date)) {
 
-        $errors[] = 'Enter correct date';
-        $isValid = false;
+        $resp['message'][] = 'Enter correct date';
+        $resp['error'] = true;
     } else {
-        $errors[] = '';
-        $isValid = true;
+        $resp['message'][] = '';
+        $resp['error'] = false;
     }
 }
 
 if (!isset($publish_in_index)) {
-    $errors[] = 'Check Yes or No';
+    $resp['message'][] = 'Check Yes or No';
+    $resp['error'] = true;
+} else {
+    $resp['message'][] = '';
+    $resp['error'] = false;
 }
 
 if (in_array((int) $category, [1, 2, 3])) {
     var_dump(in_array((int) $category, [1, 2, 3]));
-    $errors[] = '';
-    $isValid = true;
+    $resp['message'][] = '';
+    $resp['error'] = false;
+
 } else {
-    $errors[] = 'Choose category';
-    $isValid = false;
+    $resp['message'][] = 'Choose category';
+    $resp['error'] = true;
 }
 
-if ($isValid === true) {
-    session_destroy();
-}
-var_dump($errors);
+header("Content-type: application/json");
+echo json_encode($resp);
+die();

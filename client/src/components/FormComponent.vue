@@ -6,17 +6,20 @@
           <label for="title" class="col-md-2 col-form-label">Заголовок</label>
           <div class="col-md-10 mb-3">
             <input type="text" class="form-control" id="title" name="title" v-model="title">
-            <div class="invalid-feedback"></div>
+            <div class="invalid-feedback d-block">
+              {{ this.errors ? this.errors[0] : '' }}
+            </div>
           </div>
         </div>
 
         <div class="form-group row">
           <label for="annotation" class="col-md-2 col-form-label">Аннотация</label>
           <div class="col-md-10 mb-3">
-            <textarea name="annotation" id="annotation" class="form-control" cols="30" rows="10"
-              v-model="annotation">
+            <textarea name="annotation" id="annotation" class="form-control" cols="30" rows="10" v-model="annotation">
             </textarea>
-            <div class="invalid-feedback"></div>
+            <div class="invalid-feedback d-block">
+              {{ this.errors ? this.errors[1] : '' }}
+            </div>
           </div>
         </div>
 
@@ -25,7 +28,9 @@
           <div class="col-md-10 mb-3">
             <textarea name="content" id="content" class="form-control" cols="30" rows="10" v-model="content">
             </textarea>
-            <div class="invalid-feedback"></div>
+            <div class="invalid-feedback d-block">
+              {{ this.errors ? this.errors[2] : '' }}
+            </div>
           </div>
         </div>
 
@@ -33,7 +38,9 @@
           <label for="email" class="col-md-2 col-form-label">Email автора для связи</label>
           <div class="col-md-10 mb-3">
             <input type="email" class="form-control" id="email" name="email" v-model="email">
-            <div class="invalid-feedback"></div>
+            <div class="invalid-feedback d-block">
+              {{ this.errors ? this.errors[3] : '' }}
+            </div>
           </div>
         </div>
 
@@ -41,7 +48,9 @@
           <label for="views" class="col-md-2 col-form-label">Кол-во просмотров</label>
           <div class="col-md-10 mb-3">
             <input type="text" class="form-control" id="views" name="views" v-model="views">
-            <div class="invalid-feedback"></div>
+            <div class="invalid-feedback d-block">
+              {{ this.errors ? this.errors[4] : '' }}
+            </div>
           </div>
         </div>
 
@@ -49,7 +58,9 @@
           <label for="date" class="col-md-2 col-form-label">Дата публикации</label>
           <div class="col-md-10 mb-3">
             <input type="date" class="form-control" id="date" name="date" v-model="date">
-            <div class="invalid-feedback"></div>
+            <div class="invalid-feedback d-block">
+              {{ this.errors ? this.errors[5] : '' }}
+            </div>
           </div>
         </div>
 
@@ -57,7 +68,7 @@
           <label for="is_publish" class="col-md-2 col-form-label">Публичная новость</label>
           <div class="col-md-10 mb-3">
             <input type="checkbox" class="form-control" id="is_publish" name="is_publish">
-            <div class="invalid-feedback"></div>
+            <div class="invalid-feedback d-block"></div>
           </div>
         </div>
 
@@ -65,29 +76,21 @@
           <label class="col-md-2 col-form-label">Публиковать на главной</label>
           <div class="col-md-10 mb-3">
             <div class="form-check">
-              <input class="form-check-input"
-                type="radio" 
-                name="publish_in_index" 
-                id="publish_in_index_yes" 
-                v-model="publish_in_index"
-                value="yes"
-                checked>
+              <input class="form-check-input" type="radio" name="publish_in_index" id="publish_in_index_yes"
+                v-model="publish_in_index" value="yes" :checked="isValid">
               <label class="form-check-label" for="publish_in_index_yes">
                 Да
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" 
-                type="radio" 
-                name="publish_in_index" 
-                id="publish_in_index_no" 
-                v-model="publish_in_index"
-                value="no">
+              <input class="form-check-input" type="radio" name="publish_in_index" id="publish_in_index_no"
+                v-model="publish_in_index" value="no">
               <label class="form-check-label" for="publish_in_index_no">
                 Нет
               </label>
             </div>
-            <div class="invalid-feedback"></div>
+            <div class="invalid-feedback d-block">
+            </div>
           </div>
         </div>
 
@@ -100,7 +103,9 @@
               <option value="2">Культура</option>
               <option value="3">Политика</option>
             </select>
-            <div class="invalid-feedback"></div>
+            <div class="invalid-feedback d-block">
+              {{ this.errors ? this.errors[6] : '' }}
+            </div>
           </div>
         </div>
 
@@ -144,31 +149,42 @@ export default {
     submitForm() {
       axios.post(
         'http://localhost:81/vue-php-form-validation/server/validation.php', this.formData
-        )
+      )
         .then(response => {
-          console.log('resp', response)
-          if (response.data) {
-            console.log('true', response.data);
+          if (response.data['error']) {
+            console.log('err', response.data['error'])
+            this.errors = response.data['message'];
+            this.isValid = false;
+          } else {
             this.errors = [];
             this.isValid = true;
-          } else {
-            console.log('false', response.data);
-            this.errors = response.data.errors;
-            this.isValid = false;
+            this.title = '';
+            this.annotation = '';
+            this.content = '';
+            this.email = '';
+            this.views = '';
+            this.date = '';
+            this.category = '';
           }
         })
         .catch(err => console.log(err));
 
       // axiosInstance(this.formData)
       //   .then(response => {
-      //     if (response.data.status) {
-      //       console.log('true', response.data);
+      //     if (response.data['error']) {
+      //       console.log('resp', response.data);
+      //       this.errors = response.data['message'];
+      //       this.isValid = false;
+      //     } else {
       //       this.errors = [];
       //       this.isValid = true;
-      //     } else {
-      //       console.log('false', response.data);
-      //       this.errors = response.data.errors;
-      //       this.isValid = false;
+      //       this.title = '';
+      //       this.annotation = '';
+      //       this.content = '';
+      //       this.email = '';
+      //       this.views = '';
+      //       this.date = '';
+      //       this.category = '';
       //     }
       //   })
       //   .catch(err => console.log(err))
@@ -186,7 +202,6 @@ export default {
         date: this.date,
         publish_in_index: this.publish_in_index,
         category: this.category,
-        isValid: this.isValid,
       }
     }
   }
