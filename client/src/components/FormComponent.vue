@@ -152,7 +152,6 @@ export default {
       )
         .then(response => {
           if (response.data['error']) {
-            console.log('err', response.data['error'])
             this.errors = response.data['message'];
             this.isValid = false;
           } else {
@@ -170,9 +169,10 @@ export default {
         .catch(err => console.log(err));
 
       // axiosInstance(this.formData)
-      //   .then(response => {
+      // .then(response => {
+      //     console.log('resp', response)
       //     if (response.data['error']) {
-      //       console.log('resp', response.data);
+      //       console.log('msg', response.data['message'])
       //       this.errors = response.data['message'];
       //       this.isValid = false;
       //     } else {
