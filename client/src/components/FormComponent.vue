@@ -125,8 +125,7 @@
 </template>
 
 <script>
-// import axiosInstance from '../axios-config';
-import axios from 'axios';
+import axiosInstance from '../axios-config';
 
 export default {
   name: 'FormComponent',
@@ -147,9 +146,7 @@ export default {
 
   methods: {
     submitForm() {
-      axios.post(
-        'http://localhost:81/vue-php-form-validation/server/validation.php', this.formData
-      )
+      axiosInstance.post('/validation.php', this.formData)
         .then(response => {
           if (response.data['error']) {
             this.errors = response.data['message'];
@@ -166,28 +163,7 @@ export default {
             this.category = '';
           }
         })
-        .catch(err => console.log(err));
-
-      // axiosInstance(this.formData)
-      // .then(response => {
-      //     console.log('resp', response)
-      //     if (response.data['error']) {
-      //       console.log('msg', response.data['message'])
-      //       this.errors = response.data['message'];
-      //       this.isValid = false;
-      //     } else {
-      //       this.errors = [];
-      //       this.isValid = true;
-      //       this.title = '';
-      //       this.annotation = '';
-      //       this.content = '';
-      //       this.email = '';
-      //       this.views = '';
-      //       this.date = '';
-      //       this.category = '';
-      //     }
-      //   })
-      //   .catch(err => console.log(err))
+        .catch(err => console.log(err))
     }
   },
 

@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  method: 'POST',
-  baseURL: 'http://localhost:81/vue-php-form-validation/server/validation.php',
+  baseURL: 'http://localhost:81/vue-php-form-validation/server',
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
@@ -10,4 +9,4 @@ const axiosInstance = axios.create({
   crossdomain: true,
 });
 
-export default axiosInstance;
+export default axiosInstance
